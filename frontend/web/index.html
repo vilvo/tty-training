@@ -17,6 +17,7 @@
 			<input ng-model="textInput">
 		</md-input-container>
 		<md-button ng-click="addItem()" class="md-raised md-primary">Add order</md-button>
+		<md-button ng-click="fetchItems()" class="md-raised md-primary">Fetch orders</md-button>
 	</div>
 
 	<!-- Angular Material requires Angular.js Libraries -->
@@ -39,14 +40,38 @@
 			$scope.orders = ["Bluetooth Headphones", "Christmas Gift"];
 
 			/*
-			 * Functions added to scope can be used as in the demo button
-			 * Replace this function with your own implementation that calls the back-end
-			 * Tip: Use https://docs.angularjs.org/api/ng/service/$http
+			 * Documentation https://docs.angularjs.org/api/ng/service/$http
 			 */
 			$scope.addItem = function () {
-				var item = $scope.textInput;
-				if ($scope.orders.indexOf(item) == -1)
-					$scope.orders.push($scope.textInput);
+				var data = $scope.textInput;
+
+				$http.post(window.location.href+'interface/', data);
+
+				$scope.textInput = "";
+			}
+
+			$scope.fetchItems = function () {
+				var data = $scope.textInput;
+
+				/*
+				 * Rest interface documentation for mongodb: https://docs.mongodb.com/ecosystem/tools/http-interfaces/#simple-rest-api
+				 * Remember --rest command line switch!
+				 */
+				$http.get(window.location.href+'ordersDB/orders/?filter_ordered=1').then(function(response) {
+					// Get data
+					content = angular.fromJson(response.data);
+
+					// Prepare array for switch to avoid multiple angular digests
+					var newRows = [];
+
+					// Push content
+					content.rows.forEach(function(row) {
+						newRows.push(row.name);
+					});
+
+					// Swap content
+					$scope.orders = newRows;
+				});
 			}
 		});
 		</script>
