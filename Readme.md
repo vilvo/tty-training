@@ -1,6 +1,6 @@
 3p MVP
 
-==Setup
+##Setup
 ```
 $ docker network create --driver bridge training
 $ docker run --network=training -d --name mongo mongo mongod --rest
